@@ -1,10 +1,13 @@
 import ReactDOM from "react-dom/client";
-import App from "./pages/App.tsx";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { NextUIProvider } from "@nextui-org/react";
+
 import "./index.css";
 
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Nav from "./components/Nav.tsx";
+import App from "./pages/App.tsx";
+import Posts from "./pages/Posts.tsx";
 
 const router = createBrowserRouter([
   {
@@ -12,16 +15,18 @@ const router = createBrowserRouter([
     element: <App />,
   },
   {
-    path: "about",
-    element: <div>About</div>,
+    path: "/posts",
+    element: <Posts />,
   },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <>
     <NextUIProvider>
-      <Nav />
-      <RouterProvider router={router} />
+      <NextThemesProvider attribute="class" defaultTheme="dark">
+        <Nav />
+        <RouterProvider router={router} />
+      </NextThemesProvider>
     </NextUIProvider>
   </>
 );
