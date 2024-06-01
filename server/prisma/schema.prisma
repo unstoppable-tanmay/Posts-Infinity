@@ -14,12 +14,14 @@ datasource db {
 }
 
 model User {
-  id       String    @id @default(cuid()) @map("_id")
-  name     String
-  email    String    @unique
-  password String
-  posts    Post[]
-  Comment  Comment[]
+  id             String    @id @default(cuid()) @map("_id")
+  username       String
+  name           String
+  email          String    @unique
+  password       String
+  profilePicture String
+  posts          Post[]
+  Comment        Comment[]
 }
 
 model Post {
