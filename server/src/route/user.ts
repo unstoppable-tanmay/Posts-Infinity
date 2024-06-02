@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import express, { Request, Response } from "express";
-import { sign, decode, JwtPayload } from "jsonwebtoken";
+import { sign, decode } from "jsonwebtoken";
 import { compareSync, hashSync } from "bcrypt";
 import { body, validationResult } from "express-validator";
 import prisma from "../../prisma/prisma";
@@ -9,14 +10,16 @@ export const userRouter = express.Router();
 userRouter.post(
   "/signup",
   [
+    body("name").not().isEmpty(),
     body("username").not().isEmpty(),
     body("email").isEmail(),
     body("password").isLength({ min: 6 }),
+    body("profilePicture").not().isEmpty(),
   ],
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(201).json({ errors: errors.array() });
     }
 
     const { username, email, password, name, profilePicture } = req.body;
@@ -30,7 +33,7 @@ userRouter.post(
       });
       if (user) {
         return res
-          .status(400)
+          .status(201)
           .json({ msg: "User with Same Username Or Email exists" });
       }
 
@@ -58,7 +61,7 @@ userRouter.post(
             });
           } else {
             return res
-              .cookie("token", { token }, { httpOnly: true, maxAge: 900000 })
+              .cookie("token", token, { httpOnly: true, maxAge: 900000 })
               .status(200)
               .json({
                 success: true,
@@ -82,23 +85,23 @@ userRouter.post(
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res
-        .status(400)
+        .status(201)
         .json({ success: false, data: null, msg: errors.array()[0].msg });
     }
 
     const { email, password } = req.body;
 
     try {
-      let user = await prisma.user.findUnique({ where: { email } });
+      const user = await prisma.user.findUnique({ where: { email } });
       if (!user) {
         return res
-          .status(400)
+          .status(201)
           .json({ success: false, data: null, msg: "No User Found" });
       }
 
       if (!compareSync(password, user.password)) {
         return res
-          .status(400)
+          .status(201)
           .json({ success: false, data: null, msg: "Worng Password" });
       }
 
@@ -116,7 +119,7 @@ userRouter.post(
             });
           } else {
             return res
-              .cookie("token", { token }, { httpOnly: true, maxAge: 900000 })
+              .cookie("token", token, { httpOnly: true, maxAge: 900000 })
               .status(200)
               .json({
                 success: true,
@@ -140,12 +143,12 @@ userRouter.get("/", async (req: Request, res: Response) => {
 
   if (!token) {
     return res
-      .status(400)
+      .status(201)
       .json({ success: false, data: null, msg: "No Token Provided" });
   }
 
   try {
-    let user = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: {
         id: (token as any).id,
       },
@@ -153,7 +156,7 @@ userRouter.get("/", async (req: Request, res: Response) => {
 
     if (!user) {
       return res
-        .status(400)
+        .status(201)
         .json({ success: false, data: null, msg: "No User Found" });
     }
 

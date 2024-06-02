@@ -12,19 +12,15 @@ import {
   Input,
   Link,
 } from "@nextui-org/react";
-import { FaLock, FaLockOpen } from "react-icons/fa";
+import { FaLock, FaPlus } from "react-icons/fa";
 import { IoMail } from "react-icons/io5";
 import { useRecoilState } from "recoil";
-import { authAtom, userAtom } from "../../atom/atom";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-export default function Signin() {
-  const [user, setUser] = useRecoilState(userAtom);
-  const [auth, setAuth] = useRecoilState(authAtom);
+export default function CreatePost() {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-  const [password, setPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -39,8 +35,8 @@ export default function Signin() {
       { withCredentials: true }
     );
     if (!res.data.status) {
-      setUser(res.data.data);
-      setAuth(true);
+      // setUser(res.data.data);
+      // setAuth(true);
       return onClose();
     }
     toast(res.data.msg);
@@ -52,9 +48,14 @@ export default function Signin() {
 
   return (
     <>
-      <Button onPress={onOpen} size="sm">
-        Log In
-      </Button>
+      <div className="w-full sticky top-0 py-5 flex items-center justify-center text-white z-[1000]">
+        <div
+          className="button w-10 p-4 aspect-square rounded-full bg-white flex items-center justify-center text-black font-2xl cursor-pointer hover:scale-105 active:scale-100 duration-200 select-none"
+          onClick={onOpen}
+        >
+          <FaPlus />
+        </div>
+      </div>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
         <ModalContent>
           {(onClose) => (
@@ -79,15 +80,11 @@ export default function Signin() {
                 />
                 <Input
                   endContent={
-                    password ? (
-                      <FaLockOpen className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
-                    ) : (
-                      <FaLock className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
-                    )
+                    <FaLock className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
                   }
                   label="Password"
                   placeholder="Enter your password"
-                  type={password ? "text" : "password"}
+                  type="password"
                   variant="bordered"
                   className="border-white/20"
                   onChange={(e) => onchange("password", e.target.value)}

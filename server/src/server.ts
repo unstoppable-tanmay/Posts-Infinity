@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
+import cors, { CorsOptions } from "cors";
 
 import { userRouter } from "./route/user";
 import { postRouter } from "./route/posts";
@@ -11,6 +12,16 @@ dotenv.config();
 
 const app = express();
 
+const corsOpt: CorsOptions = {
+  origin: [
+    "http://localhost:5173",
+    "**",
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOpt));
 app.use(cookieParser());
 app.use(bodyParser.json());
 
