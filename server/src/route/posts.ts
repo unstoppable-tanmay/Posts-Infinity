@@ -64,7 +64,7 @@ postRouter.post(
 
     const { content, title, userId } = req.body;
     try {
-      const post = prisma.post.create({
+      const post = await prisma.post.create({
         data: {
           content,
           title,
@@ -76,8 +76,10 @@ postRouter.post(
         },
       });
 
+      console.log(post)
+
       if (!post)
-        res
+        return res
           .status(400)
           .json({ success: false, data: null, msg: "Server error" });
 

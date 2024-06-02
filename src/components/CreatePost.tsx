@@ -8,35 +8,33 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
-  Checkbox,
   Input,
-  Link,
 } from "@nextui-org/react";
-import { FaLock, FaPlus } from "react-icons/fa";
-import { IoMail } from "react-icons/io5";
-import { useRecoilState } from "recoil";
+import { FaPlus } from "react-icons/fa";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useRecoilState } from "recoil";
+import { userAtom } from "../atom/atom";
 
 export default function CreatePost() {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const [user, setUser] = useRecoilState(userAtom);
 
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    content: "",
+    title: "",
   });
 
-  const login = async () => {
-    // e.preventDefault();
+  const create = async () => {
     const res = await axios.post(
-      import.meta.env.VITE_SERVER_URL + "/user/login",
-      formData,
+      import.meta.env.VITE_SERVER_URL + "/posts/",
+      { ...formData, userId: user.id },
       { withCredentials: true }
     );
     if (!res.data.status) {
-      // setUser(res.data.data);
-      // setAuth(true);
+      // toast("Created Post - " + formData.title);
+      toast(res.data.msg);
       return onClose();
     }
     toast(res.data.msg);
@@ -48,55 +46,52 @@ export default function CreatePost() {
 
   return (
     <>
-      <div className="w-full sticky top-0 py-5 flex items-center justify-center text-white z-[1000]">
+      <div className="w-full sticky top-0 py-7 flex items-center justify-center text-white z-[1000]">
         <div
-          className="button w-10 p-4 aspect-square rounded-full bg-white flex items-center justify-center text-black font-2xl cursor-pointer hover:scale-105 active:scale-100 duration-200 select-none"
+          className="button p-4 aspect-square rounded-full bg-white flex items-center justify-center text-black font-2xl cursor-pointer hover:scale-105 active:scale-100 duration-200 select-none"
           onClick={onOpen}
         >
           <FaPlus />
         </div>
       </div>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        placement="center"
+        backdrop="blur"
+      >
         <ModalContent>
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Hey Lets Scroll !
+                Hey Lets Create For Scroll ✨
               </ModalHeader>
               <ModalBody>
                 <Input
                   autoFocus
-                  endContent={
-                    <IoMail className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
-                  }
-                  label="Email"
-                  placeholder="Enter your email"
+                  placeholder="Title"
                   variant="bordered"
                   validate={(_e) => {
                     return "";
                   }}
-                  onChange={(e) => onchange("email", e.target.value)}
-                  value={formData.email}
+                  onChange={(e) => onchange("title", e.target.value)}
+                  value={formData.title}
                 />
                 <Input
-                  endContent={
-                    <FaLock className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
-                  }
-                  label="Password"
-                  placeholder="Enter your password"
-                  type="password"
+                  placeholder="Image Link"
+                  type="text"
                   variant="bordered"
                   className="border-white/20"
-                  onChange={(e) => onchange("password", e.target.value)}
-                  value={formData.password}
+                  onChange={(e) => onchange("content", e.target.value)}
+                  value={formData.content}
                 />
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="flat" onPress={onClose}>
                   Close
                 </Button>
-                <Button color="primary" onClick={login}>
-                  Sign in
+                <Button color="primary" onClick={create}>
+                  Create
                 </Button>
               </ModalFooter>
             </>
