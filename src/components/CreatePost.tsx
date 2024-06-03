@@ -15,11 +15,12 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useRecoilState } from "recoil";
-import { userAtom } from "../atom/atom";
+import { authAtom, userAtom } from "../atom/atom";
 
 export default function CreatePost() {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-  const [user, setUser] = useRecoilState(userAtom);
+  const [user, __] = useRecoilState(userAtom);
+  const [auth, _] = useRecoilState(authAtom);
 
   const [formData, setFormData] = useState({
     content: "",
@@ -43,6 +44,8 @@ export default function CreatePost() {
   const onchange = (key: keyof typeof formData, value: any) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
+
+  if (!auth) return <></>;
 
   return (
     <>

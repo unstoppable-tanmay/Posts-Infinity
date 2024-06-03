@@ -144,7 +144,7 @@ userRouter.get("/", async (req: Request, res: Response) => {
   if (!token) {
     return res
       .status(201)
-      .json({ success: false, data: null, msg: "No Token Provided" });
+      .json({ success: false, data: null, msg: "" });
   }
 
   try {

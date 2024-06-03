@@ -22,7 +22,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
           );
           if (!data.data.status) {
             setAuth(false);
-            toast(data.data.msg);
+            // toast(data.data.msg);
           }
           return data.data.data;
         } else {

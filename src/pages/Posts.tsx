@@ -66,7 +66,7 @@ const Posts = () => {
           </span>
         </div>
       }
-      className="w-[clamp(100px,400px,90vw)] flex min-h-max no-scrollbar mt-6 overflow-x-hidden flex-col gap-10"
+      className="w-[clamp(100px,400px,90vw)] flex min-h-max no-scrollbar mt-6 overflow-x-hidden flex-col gap-10 select-none"
     >
       {posts &&
         posts.map((e, i) => {
