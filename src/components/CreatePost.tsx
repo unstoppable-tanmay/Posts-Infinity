@@ -16,6 +16,12 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useRecoilState } from "recoil";
 import { authAtom, userAtom } from "../atom/atom";
+import z from "zod";
+
+const postSchema = z.object({
+  title: z.string().min(3, "Title Should Be There "),
+  content: z.string({ message: "Image Should Be There" }),
+});
 
 export default function CreatePost() {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
@@ -28,6 +34,10 @@ export default function CreatePost() {
   });
 
   const create = async () => {
+    const data = postSchema.safeParse(formData);
+    if (!data.success) {
+      return toast(data.error.errors[0].message);
+    }
     const res = await axios.post(
       import.meta.env.VITE_SERVER_URL + "/posts/",
       { ...formData, userId: user.id },
@@ -49,7 +59,7 @@ export default function CreatePost() {
 
   return (
     <>
-      <div className="w-full sticky top-0 py-7 flex items-center justify-center text-white z-[1000]">
+      <div className="w-min sticky top-0 translate-x-[-50%] left-[50%] py-7 flex items-center justify-center text-white z-[1000]">
         <div
           className="button p-4 aspect-square rounded-full bg-white flex items-center justify-center text-black font-2xl cursor-pointer hover:scale-105 active:scale-100 duration-200 select-none"
           onClick={onOpen}

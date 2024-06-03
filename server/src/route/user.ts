@@ -61,7 +61,12 @@ userRouter.post(
             });
           } else {
             return res
-              .cookie("token", token, { maxAge: 900000 })
+              .cookie("token", token, {
+                httpOnly: true,
+                maxAge: 900000,
+                secure: true,
+                sameSite: "none",
+              })
               .status(200)
               .json({
                 success: true,
@@ -119,7 +124,12 @@ userRouter.post(
             });
           } else {
             return res
-              .cookie("token", token, { maxAge: 900000 })
+              .cookie("token", token, {
+                httpOnly: true,
+                maxAge: 900000,
+                secure: true,
+                sameSite: "none",
+              })
               .status(200)
               .json({
                 success: true,

@@ -3,7 +3,7 @@ import { postType } from "../types/types";
 
 const Post = ({ post }: { post: postType }) => {
   return (
-    <div className="w-full flex flex-col gap-3 select-none">
+    <div className="w-full flex flex-col gap-3 select-none mb-10">
       <div className="author flex items-center gap-2">
         <Avatar src={post.author?.profilePicture} />
         <div className="details flex flex-col">

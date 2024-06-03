@@ -16,22 +16,22 @@ const Posts = () => {
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
-    if (auth) {
-      const res = await axios.get(import.meta.env.VITE_SERVER_URL + "/posts", {
-        withCredentials: true,
-      });
-      if (res.data.success) {
-        setPosts((prev) => [...prev, ...res.data.data.posts]);
-        setCount(res.data.data.count);
-        setLoading(false);
-      }
+    // if (auth) {
+    const res = await axios.get(import.meta.env.VITE_SERVER_URL + "/posts", {
+      withCredentials: true,
+    });
+    if (res.data.success) {
+      setPosts((prev) => [...prev, ...res.data.data.posts]);
+      setCount(res.data.data.count);
+      setLoading(false);
     }
+    // }
   };
 
   useEffect(() => {
     fetchData();
   }, []);
-  return !loading ? (
+  return (
     <InfiniteScroll
       refreshFunction={async () => {
         const res = await axios.get(
@@ -40,12 +40,12 @@ const Posts = () => {
             withCredentials: true,
           }
         );
-        setPosts([...res.data.data.posts]);
-        setCount(res.data.data.count);
+        if (res.data.success) {
+          setPosts([...res.data.data.posts]);
+        }
       }}
       dataLength={posts.length}
       next={fetchData}
-      inverse
       hasMore={posts.length < count}
       loader={
         <div className="wrapper w-full my-6 h-max flex items-center justify-center">
@@ -73,17 +73,12 @@ const Posts = () => {
           </span>
         </div>
       }
-      className="w-[clamp(100px,400px,90vw)] flex min-h-max no-scrollbar mt-6 overflow-x-hidden flex-col gap-10 select-none"
+      className="w-[clamp(100px,400px,90vw)] gap-10"
     >
-      {!loading &&
-        posts.map((e, i) => {
-          return <Post post={e} key={i} />;
-        })}
+      {posts.map((e, i) => {
+        return <Post post={e} key={i} />;
+      })}
     </InfiniteScroll>
-  ) : (
-    <div className="wrapper py-20">
-      <Spinner />
-    </div>
   );
 };
 

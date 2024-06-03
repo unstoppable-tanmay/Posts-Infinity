@@ -15,6 +15,12 @@ import { authAtom, userAtom } from "../../atom/atom";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import z from "zod";
+
+const signinSchema = z.object({
+  email: z.string().email("Invalid Email"),
+  password: z.string().min(8, "Password Atleast Contain 3 letters"),
+});
 
 export default function Signin() {
   const [user, setUser] = useRecoilState(userAtom);
@@ -28,14 +34,17 @@ export default function Signin() {
   });
 
   const login = async () => {
-    // e.preventDefault();
+    const data = signinSchema.safeParse(formData);
+    if (!data.success) {
+      return toast(data.error.errors[0].message);
+    }
     const res = await axios.post(
       import.meta.env.VITE_SERVER_URL + "/user/login",
       formData,
       { withCredentials: true }
     );
     if (res.data.success) {
-      console.log(res.data)
+      console.log(res.data);
       setUser(res.data.data);
       onClose();
       setFormData({

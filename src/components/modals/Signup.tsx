@@ -14,15 +14,28 @@ import {
 } from "@nextui-org/react";
 import axios from "axios";
 import { useState } from "react";
-import { FaLock } from "react-icons/fa";
+import { FaLock, FaLockOpen } from "react-icons/fa";
 import { useRecoilState } from "recoil";
 import { authAtom, userAtom } from "../../atom/atom";
 import { toast } from "react-toastify";
+import { redirect } from "react-router-dom";
+import z from "zod";
+
+const signupSchema = z.object({
+  email: z.string().email("Invalid Email"),
+  name: z.string().min(3, "Name Atleast Contain 3 letters"),
+  password: z.string().min(8, "Password Atleast Contain 3 letters"),
+  validatepassword: z.string().min(8, "Password Atleast Contain 3 letters"),
+  username: z.string({ message: "UserName Required" }),
+  profilePicture: z.string({ message: "Profile Picture Link Is Required" }),
+  accept: z.boolean({ coerce: true, message: "Privacy Policy Should Checked" }),
+});
 
 export default function Signup() {
   const [user, setUser] = useRecoilState(userAtom);
   const [auth, setAuth] = useRecoilState(authAtom);
-  const { isOpen, onOpen, onOpenChange,onClose } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const [password, setPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -31,19 +44,31 @@ export default function Signup() {
     validatepassword: "",
     username: "",
     profilePicture: "",
+    accept: false,
   });
 
   const signup = async () => {
-    // e.preventDefault();
+    const data = signupSchema.safeParse(formData);
+    if (!data.success) {
+      return toast(data.error.errors[0].message);
+    }
+    if (formData.password != formData.validatepassword) {
+      return toast("Validate Password Not Match");
+    }
+    if (!formData.accept) {
+      return toast("Privacy Policy Should Checked");
+    }
     const res = await axios.post(
       import.meta.env.VITE_SERVER_URL + "/user/signup",
-      formData,{withCredentials:true}
+      formData,
+      { withCredentials: true }
     );
-    if (!res.data.success) {
+    if (res.data.success) {
       setUser(res.data.data);
-      setAuth(true)
-      return onClose()
+      setAuth(true);
+      return onClose();
     }
+    redirect("/");
     toast(res.data.msg);
   };
 
@@ -67,7 +92,6 @@ export default function Signup() {
                 <Input
                   autoFocus
                   placeholder="Enter Your Email"
-                  variant="bordered"
                   required
                   validate={(_e) => {
                     return "";
@@ -77,30 +101,56 @@ export default function Signup() {
                 />
                 <Input
                   endContent={
-                    <FaLock className="text-xl text-default-400 cursor-pointer flex-shrink-0" />
+                    <button
+                      className="focus:outline-none"
+                      type="button"
+                      onClick={() => setPassword(!password)}
+                    >
+                      {password ? (
+                        <FaLockOpen className="text-default-400 pointer-events-none flex-shrink-0 cursor-pointer" />
+                      ) : (
+                        <FaLock className="text-default-400 pointer-events-none flex-shrink-0 cursor-pointer" />
+                      )}
+                    </button>
                   }
-                  required
-                  placeholder="Enter Your Password"
-                  type="password"
-                  variant="bordered"
+                  placeholder="Enter your password"
+                  type={password ? "text" : "password"}
                   className="border-white/20"
-                  value={formData.password}
                   onChange={(e) => onchange("password", e.target.value)}
+                  value={formData.password}
                 />
                 <Input
-                  required
+                  endContent={
+                    <button
+                      className="focus:outline-none"
+                      type="button"
+                      onClick={() => setPassword(!password)}
+                    >
+                      {password ? (
+                        <FaLockOpen className="text-default-400 pointer-events-none flex-shrink-0 cursor-pointer" />
+                      ) : (
+                        <FaLock className="text-default-400 pointer-events-none flex-shrink-0 cursor-pointer" />
+                      )}
+                    </button>
+                  }
+                  errorMessage={
+                    formData.password != formData.validatepassword ? (
+                      <span className="text-red-400">
+                        Password Doesn't Match
+                      </span>
+                    ) : (
+                      ""
+                    )
+                  }
                   placeholder="Re Enter Your Password"
-                  variant="bordered"
-                  validate={(_e) => {
-                    return "";
-                  }}
-                  value={formData.validatepassword}
+                  type={password ? "text" : "password"}
+                  className="border-white/20"
                   onChange={(e) => onchange("validatepassword", e.target.value)}
+                  value={formData.validatepassword}
                 />
                 <Input
                   required
                   placeholder="Your User Name"
-                  variant="bordered"
                   validate={(_e) => {
                     return "";
                   }}
@@ -110,7 +160,6 @@ export default function Signup() {
                 <Input
                   required
                   placeholder="Your Name"
-                  variant="bordered"
                   validate={(_e) => {
                     return "";
                   }}
@@ -120,7 +169,6 @@ export default function Signup() {
                 <Input
                   required
                   placeholder="Your Profile Image"
-                  variant="bordered"
                   validate={(_e) => {
                     return "";
                   }}
@@ -129,6 +177,10 @@ export default function Signup() {
                 />
                 <div className="flex py-2 px-1 justify-between text-white">
                   <Checkbox
+                    checked={formData.accept}
+                    onChange={(e) => {
+                      onchange("accept", e);
+                    }}
                     required
                     classNames={{
                       label: "text-xs text-white",
