@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Modal,
   ModalContent,
@@ -8,9 +6,7 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
-  Checkbox,
   Input,
-  Link,
 } from "@nextui-org/react";
 import { FaLock, FaLockOpen } from "react-icons/fa";
 import { IoMail } from "react-icons/io5";
@@ -38,11 +34,16 @@ export default function Signin() {
       formData,
       { withCredentials: true }
     );
-    if (!res.data.status) {
+    if (res.data.success) {
+      console.log(res.data)
       setUser(res.data.data);
-      setAuth(true);
-      return onClose();
+      onClose();
+      setFormData({
+        email: "",
+        password: "",
+      });
     }
+    setAuth(res.data.success);
     toast(res.data.msg);
   };
 
@@ -66,11 +67,11 @@ export default function Signin() {
                 <Input
                   autoFocus
                   endContent={
-                    <IoMail className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                    <IoMail className="text-default-400 pointer-events-none flex-shrink-0" />
                   }
-                  label="Email"
+                  // label="Email"
                   placeholder="Enter your email"
-                  variant="bordered"
+                  // variant="bordered"
                   validate={(_e) => {
                     return "";
                   }}
@@ -79,16 +80,22 @@ export default function Signin() {
                 />
                 <Input
                   endContent={
-                    password ? (
-                      <FaLockOpen className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
-                    ) : (
-                      <FaLock className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
-                    )
+                    <button
+                      className="focus:outline-none"
+                      type="button"
+                      onClick={() => setPassword(!password)}
+                    >
+                      {password ? (
+                        <FaLockOpen className="text-default-400 pointer-events-none flex-shrink-0 cursor-pointer" />
+                      ) : (
+                        <FaLock className="text-default-400 pointer-events-none flex-shrink-0 cursor-pointer" />
+                      )}
+                    </button>
                   }
-                  label="Password"
+                  // label="Password"
                   placeholder="Enter your password"
                   type={password ? "text" : "password"}
-                  variant="bordered"
+                  // variant="bordered"
                   className="border-white/20"
                   onChange={(e) => onchange("password", e.target.value)}
                   value={formData.password}

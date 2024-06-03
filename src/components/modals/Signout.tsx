@@ -12,15 +12,18 @@ import {
 import { useRecoilState } from "recoil";
 import { authAtom } from "../../atom/atom";
 import { toast } from "react-toastify";
-import { useCookies } from "react-cookie";
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
 
 export default function Signout() {
   const [auth, setAuth] = useRecoilState(authAtom);
-  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+  // const [cookies, setCookie, removeCookie] = useCookies(["token"]);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
   const signout = async () => {
-    removeCookie("token");
+    // removeCookie("token");
+    cookies.remove("token", { path: "/" });
     setAuth(false);
     toast("Sign Out Successfully");
     onClose();

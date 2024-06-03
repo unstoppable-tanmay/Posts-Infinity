@@ -16,7 +16,6 @@ import { ToastContainer } from "react-toastify";
 import { RecoilRoot } from "recoil";
 import "react-toastify/dist/ReactToastify.css";
 import CreatePost from "./components/CreatePost.tsx";
-// import CreatePost from "./components/CreatePost.tsx";
 
 const router = createBrowserRouter([
   {
@@ -31,19 +30,19 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <>
-    <RecoilRoot>
-      <QueryClientProvider client={queryClient}>
-        <NextUIProvider>
-          <NextThemesProvider attribute="class" defaultTheme="dark">
-            <AuthProvider>
-              <ToastContainer />
-              <Nav />
-              <CreatePost />
-              <RouterProvider router={router} />
-            </AuthProvider>
-          </NextThemesProvider>
-        </NextUIProvider>
-      </QueryClientProvider>
-    </RecoilRoot>
+      <RecoilRoot>
+        <QueryClientProvider client={queryClient}>
+          <NextUIProvider>
+            <NextThemesProvider attribute="class" defaultTheme="dark">
+              <AuthProvider>
+                <ToastContainer />
+                <Nav />
+                <CreatePost />
+                <RouterProvider router={router} />
+              </AuthProvider>
+            </NextThemesProvider>
+          </NextUIProvider>
+        </QueryClientProvider>
+      </RecoilRoot>
   </>
 );

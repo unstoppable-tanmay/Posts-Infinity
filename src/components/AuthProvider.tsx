@@ -1,16 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { ReactNode, useEffect } from "react";
 import { useRecoilState } from "recoil";
 import { authAtom, userAtom } from "../atom/atom";
 import { toast } from "react-toastify";
+import { redirect } from "react-router-dom";
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useRecoilState(userAtom);
   const [auth, setAuth] = useRecoilState(authAtom);
-  const { isLoading, error, data } = useQuery({
+  const { isLoading, data } = useQuery({
     queryKey: ["userData"],
     initialData: user,
     queryFn: async () => {
@@ -20,35 +19,31 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             import.meta.env.VITE_SERVER_URL! + "/user",
             { withCredentials: true }
           );
-          if (!data.data.status) {
+          if (!data.data.success) {
             setAuth(false);
-            // toast(data.data.msg);
+            redirect("/");
+            toast(data.data.msg??"error");
           }
           return data.data.data;
         } else {
           return user;
-        }
+      }
       } catch (error: any) {
-        toast(error);
+        console.log(error);
+        toast("Some error happend");
       }
     },
   });
 
   useEffect(() => {
     if (data) {
-      console.log(data)
+      console.log(data);
       setUser(data);
       setAuth(true);
     }
-  }, [data, setUser, setAuth]);
+  }, [data, setUser, setAuth, isLoading]);
 
   if (isLoading) return "Loading...";
-
-  // if(error) {
-  //   setAuth(false)
-  // }
-
-  // if (error) return "An error has occurred: " + error.message;
 
   return <>{children}</>;
 };

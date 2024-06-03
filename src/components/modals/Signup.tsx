@@ -39,7 +39,7 @@ export default function Signup() {
       import.meta.env.VITE_SERVER_URL + "/user/signup",
       formData,{withCredentials:true}
     );
-    if (!res.data.status) {
+    if (!res.data.success) {
       setUser(res.data.data);
       setAuth(true)
       return onClose()

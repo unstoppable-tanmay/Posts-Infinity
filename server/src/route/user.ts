@@ -61,7 +61,7 @@ userRouter.post(
             });
           } else {
             return res
-              .cookie("token", token, { httpOnly: true, maxAge: 900000 })
+              .cookie("token", token, { maxAge: 900000 })
               .status(200)
               .json({
                 success: true,
@@ -119,7 +119,7 @@ userRouter.post(
             });
           } else {
             return res
-              .cookie("token", token, { httpOnly: true, maxAge: 900000 })
+              .cookie("token", token, { maxAge: 900000 })
               .status(200)
               .json({
                 success: true,
@@ -144,7 +144,7 @@ userRouter.get("/", async (req: Request, res: Response) => {
   if (!token) {
     return res
       .status(201)
-      .json({ success: false, data: null, msg: "" });
+      .json({ success: false, data: null, msg: "Not Signed In" });
   }
 
   try {

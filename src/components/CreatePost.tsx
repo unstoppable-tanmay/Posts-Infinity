@@ -33,7 +33,7 @@ export default function CreatePost() {
       { ...formData, userId: user.id },
       { withCredentials: true }
     );
-    if (!res.data.status) {
+    if (!res.data.success) {
       // toast("Created Post - " + formData.title);
       toast(res.data.msg);
       return onClose();

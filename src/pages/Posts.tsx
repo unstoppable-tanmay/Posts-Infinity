@@ -4,28 +4,34 @@ import { useQuery } from "@tanstack/react-query";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { toast } from "react-toastify";
 import { useRecoilState } from "recoil";
-import { postAtom } from "../atom/atom";
+import { authAtom, postAtom } from "../atom/atom";
 import Post from "../components/Post";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
 const Posts = () => {
   const [posts, setPosts] = useRecoilState(postAtom);
+  const [auth, setAuth] = useRecoilState(authAtom);
   const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
-    const res = await axios.get(import.meta.env.VITE_SERVER_URL + "/posts", {
-      withCredentials: true,
-    });
-    console.log(res.data);
-    setPosts((prev) => [...prev, ...res.data.data.posts]);
-    setCount(res.data.data.count)
+    if (auth) {
+      const res = await axios.get(import.meta.env.VITE_SERVER_URL + "/posts", {
+        withCredentials: true,
+      });
+      if (res.data.success) {
+        setPosts((prev) => [...prev, ...res.data.data.posts]);
+        setCount(res.data.data.count);
+        setLoading(false);
+      }
+    }
   };
 
   useEffect(() => {
     fetchData();
   }, []);
-  return (
+  return !loading ? (
     <InfiniteScroll
       refreshFunction={async () => {
         const res = await axios.get(
@@ -35,10 +41,11 @@ const Posts = () => {
           }
         );
         setPosts([...res.data.data.posts]);
-        setCount(res.data.data.count)
+        setCount(res.data.data.count);
       }}
       dataLength={posts.length}
       next={fetchData}
+      inverse
       hasMore={posts.length < count}
       loader={
         <div className="wrapper w-full my-6 h-max flex items-center justify-center">
@@ -68,11 +75,15 @@ const Posts = () => {
       }
       className="w-[clamp(100px,400px,90vw)] flex min-h-max no-scrollbar mt-6 overflow-x-hidden flex-col gap-10 select-none"
     >
-      {posts &&
+      {!loading &&
         posts.map((e, i) => {
           return <Post post={e} key={i} />;
         })}
     </InfiniteScroll>
+  ) : (
+    <div className="wrapper py-20">
+      <Spinner />
+    </div>
   );
 };
 
